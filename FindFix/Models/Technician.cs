@@ -6,14 +6,21 @@ namespace FindFix.Models
         public string FullName {get; set;} = string.Empty;
         public string PhoneNumber {get; set;} = string.Empty;
         public string Email {get; set;} = string.Empty;
-        public string Service {get; set;} = string.Empty;
         public string Location {get; set;} = string.Empty;
+       // Technician short bio e. 2 years phone fixing experience 
         public string Description {get; set;} = string.Empty;
-        public int YearOfExperience {get; set;} 
+        public int YearsOfExperience {get; set;} 
         public bool IsVerified  {get; set;}
-        public string ProfileImageUrl {get; set;} = string.Empty;
         public bool IsAvailable {get; set;}
+         public string ProfileImageUrl {get; set;} = string.Empty;
+         public double AverageRating {get; set;}
+         public int ReviewCount {get; set;}
         public DateTime DateRegistered {get; set; }
+        public List<Service> Services {get; set;} = new();
+        public List<Qualification> Qualifications {get; set;} = new();
+        public List<JobRequest> JobRequests {get; set;} = new();
+          public List<Review> Reviews {get; set;} = new();
+
         
     }
 }
