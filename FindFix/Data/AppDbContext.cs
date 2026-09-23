@@ -1,7 +1,9 @@
 using FindFix.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace FindFix.Data;
-public class AppDbCOntext:DbContext
+public class AppDbCOntext:IdentityDbContext <ApplicationUser>
 {
     public AppDbCOntext (DbContextOptions <AppDbCOntext> options) : base(options)
     {

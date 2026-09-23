@@ -1,11 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using FindFix.Data;
 using Microsoft.Extensions.Options;
+using FindFix.Models;
+using Microsoft.AspNetCore.Identity;
 
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbCOntext>(options =>  options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+.AddEntityFrameworkStores<AppDbCOntext> ()
+.AddDefaultTokenProviders();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -21,7 +26,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
