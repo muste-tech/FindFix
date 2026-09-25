@@ -73,4 +73,42 @@ public class AccountController : Controller
         return RedirectToAction ("Index", "Home");
 
     }
-}
+    [HttpGet]
+    public IActionResult Login()
+    {
+        return View();
+    }
+    public async Task<IActionResult> Login(LoginViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+        var result = await _signInManager.PasswordSignInAsync(
+            model.Email, model.Password, model.RememberMe, lockoutOnFailure: false );
+            if (!result.Succeeded)
+        {
+            ModelState.AddModelError(string.Empty, "Invalid Email or Password");
+            return View(model);
+        }
+        var user = await _userManager.FindByEmailAsync(model.Email);
+        if (await _userManager.IsInRoleAsync(user!, "Customer"))
+        {
+            return RedirectToAction("Index", "Customer");
+        }
+        else if (await _userManager.IsInRoleAsync(user!, "Technician"))
+        {
+            return RedirectToAction("Index", "Technician");
+        }
+         else if (await _userManager.IsInRoleAsync(user!, "Admin"))
+        {
+            return RedirectToAction("Admin", "Admin");
+        }
+        return RedirectToAction("Index", "Home");
+    }
+      public async Task<IActionResult> Logout ()
+      {
+        await _signInManager.SignOutAsync();
+        return RedirectToAction ("Index", "Home");
+      }
+    }
