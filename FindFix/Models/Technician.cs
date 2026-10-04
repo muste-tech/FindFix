@@ -9,6 +9,7 @@ namespace FindFix.Models
         public int YearsOfExperience {get; set;} 
         public bool IsVerified  {get; set;}
         public bool IsAvailable {get; set;}
+        public bool IsProfileComplete {get; set;}= false;
          public string ProfileImageUrl {get; set;} = string.Empty;
          public double AverageRating {get; set;}
          public int ReviewCount {get; set;}

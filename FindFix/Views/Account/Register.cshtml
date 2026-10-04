@@ -17,12 +17,19 @@
     </div>
      <div class="form-group">
             <label asp-for="Password"></label>
-        <input asp-for="Password" class="form-control">
+            <div class="input-group">
+                    <input asp-for="Password" id="Password" class="form-control">
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('Password', this)">Show</button>
+            </div>
+        
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
      <div class="form-group">
             <label asp-for="ConfirmPassword"></label>
-        <input asp-for="ConfirmPassword" class="form-control">
+         <div class="input-group">
+                    <input asp-for="ConfirmPassword" id="ConfirmPassword" class="form-control">
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('ConfirmPassword', this)">Show</button>
+            </div>
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>
      <div class="form-group">
@@ -34,3 +41,16 @@
     </div>
     <button type="submit" class="btn btn-primary">Sign Up</button>
 </form>
+<script>
+    function togglePassword(fieldId, button){
+        const input = document.getElementById(fieldId);
+        if(input.type === "password"){
+            input.type = "text";
+            button.textContent = "Hide";
+        }
+        else {
+             input.type = "password";
+            button.textContent = "Show";
+        }
+    }
+</script>

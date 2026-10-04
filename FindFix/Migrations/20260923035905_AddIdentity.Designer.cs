@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FindFix.Migrations
 {
-    [DbContext(typeof(AppDbCOntext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20260923035905_AddIdentity")]
     partial class AddIdentity
     {

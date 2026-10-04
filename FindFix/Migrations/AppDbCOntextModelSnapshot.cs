@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FindFix.Migrations
 {
-    [DbContext(typeof(AppDbCOntext))]
-    partial class AppDbCOntextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AppDbContext))]
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -272,6 +272,9 @@ namespace FindFix.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsAvailable")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsProfileComplete")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsVerified")

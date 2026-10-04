@@ -1,0 +1,58 @@
+@model FindFix.Models.ViewModels.TechnicianProfileViewModel
+@{
+    ViewData ["Title"] = "Complete Your Profile";
+}
+<h2>Complete Your Profile </h2>
+<p>Tell customers about your service before you start receiving job requests.</p>
+<form asp-controller="Technician" asp-action="CompleteProfile" method="Post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Location"></label>
+        <textarea asp-for="Location" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="YearsOfExperience"></label>
+        <textarea asp-for="YearsOfExperience" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="YearsOfExperience" class="text-danger"></span>
+    </div>
+     <div class="form-group">
+        <label>Services Offered</label>
+        @for(int i =0; i< Model.AllServices.Count; i++)
+        {
+           var service = Model.AllServices[i];
+           <div class="form-check">
+            <input type="checkbox"
+            name=" SelectedServiceIds"
+            value="@service.Id"
+            class="form-check-input"
+            checked="@Model.SelectedServiceIds.Contains(service.Id)">
+            <label class="form-check-label">@service.Name</label>
+           </div>
+           
+        }
+        <span asp-validation-for="SelectedServiceIds" class="text-danger"></span>
+    </div> 
+    <h4>Qualifications</h4>
+    @for(int i = 0; i < Model.Qualifications.Count; i++) 
+    {
+        <div class="form-group border p-2 mb-2">
+            <label >Title</label>
+            <input asp-for="Qualifications[i].Title" class="form-control">
+            <label >Institution</label>
+            <input asp-for="Qualifications[i].Institution" class="form-control">
+            <label >Year</label>
+            <input asp-for="Qualifications[i].Year" class="form-control">
+            <span asp-validation-for="Qualifications[i].Year" class="text-danger"></span>
+
+        </div>
+    }
+    <button type="submit" class="btn btn-primary">Save Profile</button>
+
+</form>
+   

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FindFix.Migrations
 {
-    [DbContext(typeof(AppDbCOntext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20260922100022_InitialCreate")]
     partial class InitialCreate
     {

@@ -4,14 +4,15 @@ using FindFix.Data;
 using FindFix.Models;
 using FindFix.Models.ViewModels;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore;
 
 namespace FindFix.Controllers;
 public class AccountController : Controller
 {
    private readonly UserManager <ApplicationUser> _userManager ;
    private readonly SignInManager <ApplicationUser> _signInManager;
-   public readonly AppDbCOntext _context;
-   public AccountController (UserManager <ApplicationUser> userManager, SignInManager <ApplicationUser> signInManager, AppDbCOntext context )
+   public readonly AppDbContext _context;
+   public AccountController (UserManager <ApplicationUser> userManager, SignInManager <ApplicationUser> signInManager, AppDbContext context )
    {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -98,6 +99,11 @@ public class AccountController : Controller
         }
         else if (await _userManager.IsInRoleAsync(user!, "Technician"))
         {
+          var technician = await _context.Technicians.FirstOrDefaultAsync(t => t.UserId == user!.Id);
+          if (technician != null && !technician.IsProfileComplete)
+          {
+            return RedirectToAction("CompleteProfile", "Technician");
+          }
             return RedirectToAction("Index", "Technician");
         }
          else if (await _userManager.IsInRoleAsync(user!, "Admin"))

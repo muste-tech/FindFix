@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace FindFix.Data;
-public class AppDbCOntext:IdentityDbContext <ApplicationUser>
+public class AppDbContext:IdentityDbContext <ApplicationUser>
 {
-    public AppDbCOntext (DbContextOptions <AppDbCOntext> options) : base(options)
+    public AppDbContext (DbContextOptions <AppDbContext> options) : base(options)
     {
         
     }
