@@ -1,0 +1,46 @@
+@model FindFix.Models.ViewModels.SearchViewModel
+
+@{
+    ViewData["Title"] = "Find a Technician";
+}
+<h2>Find a Technician</h2>
+<form asp-controller="Customer"asp-action="Search" method="get">
+    <div class="form-group">
+    <label>What do you nneed help with</label>
+    <input type="text" name="serviceQuery" value="@Model.ServiceQuery" class="form-control" placeholder="plumbing">
+</div>
+<div class="form-group">
+    <label>Location</label>
+    <input type="text" name="locationQuery" value="@Model.LocationQuery" class="form-control" placeholder="plumbing">
+</div>
+<button type="submit" class="btn btn-primary">Search</button>
+</form>
+<hr>
+@if (!Model.Results.Any())
+{
+    <p>No Technician found. Try a different search</p>
+    
+}
+else
+{
+    foreach ( var tech in Model.Results)
+    {
+        <div class="border rounded p-s mb-3">
+        <h4>@tech.FullName</h4>
+        <p>
+            @if (tech.ReviewCount>0 )
+            {
+                <strong>@tech.AverageRating.ToString("0.0")</strong><text> x (@tech.ReviewCount reviews)</text>
+            }
+            else{
+                <span class="badge bg-secondary">New</span>
+            }
+        </p>
+        <p>@tech.Description</p>
+        <p><strong>Location:</strong> @tech.Location</p>
+        <p><strong>Experience:</strong> @tech.YearsOfExperience years</p>
+        <p><strong>Services:</strong> @string.Join(", ", tech.ServiceNames)</p>
+        </div>
+    }
+}
+
