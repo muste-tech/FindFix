@@ -26,7 +26,7 @@ else
     foreach ( var tech in Model.Results)
     {
         <div class="border rounded p-s mb-3">
-        <h4>@tech.FullName</h4>
+        <h4><a asp-controller="Customer" asp-action="Details" asp-route-id ="@tech.Id">@tech.FullName</a></h4>
         <p>
             @if (tech.ReviewCount>0 )
             {

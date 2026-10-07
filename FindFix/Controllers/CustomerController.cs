@@ -72,7 +72,37 @@ namespace FindFix.Controllers;
         return View (model);
 
         }
-      
+      public async Task<IActionResult> Details (int Id)
+    {
+        var technician = await _context.Technicians
+        .Include(t => t.User)
+        .Include (t => t.Services)
+        .Include(t=>t.Qualifications)
+        .FirstOrDefaultAsync (t => t.Id == Id && t.IsProfileComplete);
+        if (technician == null)
+        {
+            return NotFound();
+        }
+        var model = new TechnicianDetailsViewModel
+        {
+            Id = technician.Id,
+            FullName = technician.User.FullName,
+            Description = technician.Description,
+            Location = technician.Location,
+            YearsOfExperience = technician.YearsOfExperience,
+            AverageRatng = technician.AverageRating,
+            ReviewCount = technician.ReviewCount,
+            ProfileImageUrl = technician.ProfileImageUrl,
+            ServiceNames = technician.Services.Select(s=> s.Name).ToList(),
+            Qualifications = technician.Qualifications.Select(q=> new QualificationDisplayViewModel
+            {
+                Title = q.Title,
+                Institution = q.Institution,
+                Year = q.Year
+            }).ToList()
+        };
+        return View(model);
+    }
    }
 
    

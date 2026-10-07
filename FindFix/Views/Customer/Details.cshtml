@@ -1,0 +1,32 @@
+@model FindFix.Models.ViewModels.TechnicianDetailsViewModel
+@{
+    ViewData["Title"]= Model.FullName;
+}
+<h2>@Model.FullName</h2>
+@if (Model.ReviewCount == 0)
+{
+    <P><strong>@Model.AverageRatng.ToString("0.0")</strong> <text>x (@Model.ReviewCount reviews)</text></P>
+    
+}
+else{
+    <span class="badge bg-secondary">New</span>
+}
+<p>@Model.Description</p>
+<p><strong>Location :</strong> @Model.Location</p>
+<p><Strong>Experience :</Strong> @Model.YearsOfExperience years</p>
+<p><strong>Services :</strong> @string.Join(", ", Model.ServiceNames)</p>
+
+<h4>Qualifications</h4>
+@if(!Model.Qualifications.Any())
+{
+    <p>No Qualification listed.</p>
+}
+else{
+    <ul>
+        @foreach(var q in Model.Qualifications)
+        {
+                <li>@q.Title - @q.Institution (@q.Year)</li>
+        }
+    </ul>
+}
+<a asp-controller="Customer" asp-action="Search" class="btn btn-secondary">Back to Search</a>
