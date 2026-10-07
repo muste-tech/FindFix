@@ -58,7 +58,10 @@ namespace FindFix.Controllers;
             Id = s.Id,
             Name = s.Name
         }).ToList();
-
+        if (!model.SelectedServiceIds.Any())
+        {
+            ModelState.AddModelError(nameof(model.SelectedServiceIds), "Please select at least one service");
+        }
         if (!ModelState.IsValid)
         {
             return View(model);

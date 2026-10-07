@@ -13,7 +13,7 @@ public class TechnicianProfileViewModel
    [Range(0, 60)]
    [Display (Name = "Year Of Experience")]
    public int YearsOfExperience {get; set;}
-   [Required]
+
    [Display (Name = "Services Offered")]
    public List<int> SelectedServiceIds {get; set;} = new();
    public List<ServiceOptionViewModel> AllServices {get; set;}= new();
