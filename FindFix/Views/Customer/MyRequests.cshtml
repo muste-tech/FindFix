@@ -1,0 +1,23 @@
+@model List<FindFix.Models.JobRequest> 
+ @{
+    ViewData ["Title"] = "My Requests";
+ }
+ <h2>My Requests</h2>
+ @if(!Model.Any())
+ {
+    <p>You haven't sent a requests yet</p>
+ }
+else{
+    foreach(var req in Model)
+    {
+        <div class="border rounded p-3 mb-3">
+            <p><strong>Technician:</strong> @req.Technician.User.FullName</p>
+            <p><strong>Service:</strong> @req.Service.Name</p>
+            <p><strong>Status:</strong> @req.Status</p> 
+            <p><strong>Description:</strong> @req.Description</p>
+            <p><strong>Location:</strong> @req.Location</p>
+            <p><strong>Sent:</strong> @req.DateCreated.ToString("dd MMM yyyy")</p>
+        </div>
+    }
+}
+<a asp-controller="Customer" asp-action="Search" class="btn btn-secondary">Find another Technician</a>

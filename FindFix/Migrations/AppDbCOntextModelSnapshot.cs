@@ -142,6 +142,9 @@ namespace FindFix.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -151,6 +154,8 @@ namespace FindFix.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("ServiceId");
 
                     b.HasIndex("TechnicianId");
 
@@ -465,17 +470,29 @@ namespace FindFix.Migrations
 
             modelBuilder.Entity("FindFix.Models.JobRequest", b =>
                 {
-                    b.HasOne("FindFix.Models.Customer", null)
+                    b.HasOne("FindFix.Models.Customer", "Customer")
                         .WithMany("JobRequests")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FindFix.Models.Technician", null)
+                    b.HasOne("FindFix.Models.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FindFix.Models.Technician", "Technician")
                         .WithMany("JobRequests")
                         .HasForeignKey("TechnicianId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Service");
+
+                    b.Navigation("Technician");
                 });
 
             modelBuilder.Entity("FindFix.Models.Qualification", b =>

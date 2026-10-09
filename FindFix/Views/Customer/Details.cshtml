@@ -1,6 +1,7 @@
 @model FindFix.Models.ViewModels.TechnicianDetailsViewModel
 @{
-    ViewData["Title"]= Model.FullName;
+    ViewData["Title"]= 
+    Model.FullName;
 }
 <h2>@Model.FullName</h2>
 @if (Model.ReviewCount == 0)
@@ -29,4 +30,5 @@ else{
         }
     </ul>
 }
+<a asp-controller="Customer" asp-action="RequestJob" asp-route-technicianId="@Model.Id" class="btn btn-primary">Request this Technician</a>
 <a asp-controller="Customer" asp-action="Search" class="btn btn-secondary">Back to Search</a>

@@ -1,0 +1,31 @@
+@model FindFix.Models.ViewModels.CreateJobRequestViewModel
+@{
+    ViewData ["Title"] ="Request" + Model.TechnicianName;
+}
+<h2>Request @Model.TechnicianName</h2>
+<form asp-controller="Customer" asp-action="RequestJob" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden"  asp-for="TechnicianId">
+    <div class="form-group">
+    <label >Which service do you need</label>
+    <select asp-for="ServiceId" class="form-control">
+        <option value="">--Select a service</option>
+       @foreach(var service in Model.AvailableServices)
+       {
+        <option value="@service.Id">@service.Name</option>
+       }
+    </select>
+    <span asp-validation-for="ServiceId" class="text_danger"></span>
+    </div>
+     <div class="form-group">
+    <label >Description</label>
+        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe the problem..."></textarea>
+    <span asp-validation-for="Description" class="text_danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Location"></label>
+        <input asp-for="Location" class="form-control" placeholder="Where is the job?">
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Send Request</button>
+</form>
