@@ -27,6 +27,12 @@
                     </form>
 
                 }
+                else if(string.Equals(req.Status=="Accepted", StringComparison.OrdinalIgnoreCase))
+                {
+                    <form asp-controller="Technician" asp-action="Complete" asp-route-Id="@req.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-secondary">Mark as Completedz</button>
+                    </form>
+                }
             </div>
         }
     }

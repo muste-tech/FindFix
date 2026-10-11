@@ -139,6 +139,28 @@ namespace FindFix.Controllers;
     {
         return await UpdateStatus(Id, JobStatus.Declined);
     }
+    [HttpPost]
+    public async Task<IActionResult> Complete (int id)
+    {
+        var userId = _userManager.GetUserId(User);
+        var technician = await _context.Technicians.FirstOrDefaultAsync(t=>t.UserId==userId);
+        if (technician == null)
+        {
+            return NotFound();
+        }
+      var jobRequest = await _context.JobRequests
+      .FirstOrDefaultAsync(j=>j.Id == id && j.TechnicianId== technician.Id);
+      if (jobRequest== null)
+      {
+        return NotFound();
+      }
+      if (jobRequest.Status == JobStatus.Accepted)
+      {
+        jobRequest.Status = JobStatus.Completed;
+        await _context.SaveChangesAsync();
+      }
+      return RedirectToAction("Requests");
+    }
    private async Task<IActionResult> UpdateStatus (int id, JobStatus newStatus)
     {
         var userId = _userManager.GetUserId(User);
