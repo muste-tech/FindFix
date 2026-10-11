@@ -1,0 +1,32 @@
+@model List<FindFix.Models.ViewModels.TechnicianJobRequestViewModel>
+    @{
+        ViewData["Title"] = "Job Request";
+    }
+    <h2>Job Requests</h2>
+    @if (!Model.Any())
+    {
+        <p>No job requests yet.</p>
+    }
+    else{
+        foreach(var req in Model)
+        {
+            <div class="border rounded p-3 mb-3">
+                <p><strong>Customer:</strong> @req.CustomerName</p>
+                <p><strong>Service:</strong> @req.ServiceName</p>
+                <p><strong>Description:</strong> @req.Description</p>
+                <p><strong>Location:</strong> @req.Location</p>
+                <p><strong>Status:</strong> @req.Status</p>
+                <p><strong>Revieved:</strong> @req.DateCreated.ToString("dd MMM yyyy")</p>
+                @if(string.Equals(req.Status=="Pending", StringComparison.OrdinalIgnoreCase))
+                {
+                    <form asp-controller="Technician" asp-action="Accept" asp-route-Id="@req.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-secondary">Accept</button>
+                    </form>
+                     <form asp-controller="Technician" asp-action="Decline" asp-route-Id="@req.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-secondary">Decline</button>
+                    </form>
+
+                }
+            </div>
+        }
+    }

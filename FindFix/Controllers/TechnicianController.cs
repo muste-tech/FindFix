@@ -6,6 +6,7 @@ using FindFix.Data;
 using FindFix.Models;
 using FindFix.Models.ViewModels;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Data;
 
 
 namespace FindFix.Controllers;
@@ -102,5 +103,61 @@ namespace FindFix.Controllers;
            }
            await _context.SaveChangesAsync();
         return RedirectToAction ("Index");
+    }
+    public async Task<IActionResult> Requests()
+    {
+        var userId = _userManager.GetUserId(User);
+        var technician = await _context.Technicians.FirstOrDefaultAsync(t=>t.UserId==userId);
+        if(technician == null)
+        {
+            return NotFound();
+        }
+        var requests = await _context.JobRequests
+        .Include(j=>j.Customer).ThenInclude(c=>c.User)
+        .Include(j=>j.Service)
+        .Where(j=>j.TechnicianId==technician.Id)
+        .OrderByDescending(j=> j.DateCreated)
+        .Select(j => new TechnicianJobRequestViewModel
+        {
+            Id =j.Id,
+            CustomerName = j.Customer.User.FullName,
+            ServiceName = j.Service.Name,
+            Description = j.Description,
+            Location = j.Location,
+            Status = j.Status.ToString(),
+            DateCreated = j.DateCreated
+        }).ToListAsync();
+        return View(requests);
+    }
+    [HttpPost]
+    public async Task<IActionResult> Accept (int Id)
+    {
+        return await UpdateStatus(Id, JobStatus.Accepted);
+    }
+    [HttpPost]
+    public async Task<IActionResult> Decline (int Id)
+    {
+        return await UpdateStatus(Id, JobStatus.Declined);
+    }
+   private async Task<IActionResult> UpdateStatus (int id, JobStatus newStatus)
+    {
+        var userId = _userManager.GetUserId(User);
+        var technician = await _context.Technicians.FirstOrDefaultAsync(j=>j.UserId==userId);
+        if(technician==null)
+        {
+            return NotFound();
+        }
+        var JobRequest = await _context.JobRequests
+        .FirstOrDefaultAsync(j=>j.Id==id && j.TechnicianId == technician.Id);
+        if(JobRequest==null)
+        {
+            return NotFound();
+        }
+        if (JobRequest.Status==JobStatus.pending)
+        {
+            JobRequest.Status = newStatus;
+            await _context.SaveChangesAsync();
+        }
+        return RedirectToAction("Requests");
     }
 }
