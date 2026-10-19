@@ -3,6 +3,7 @@ using FindFix.Data;
 using Microsoft.Extensions.Options;
 using FindFix.Models;
 using Microsoft.AspNetCore.Identity;
+using FindFix.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +14,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 .AddDefaultTokenProviders();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession( Options=>
+    {
+        Options.IdleTimeout = TimeSpan.FromMinutes(15);
+        Options.Cookie.HttpOnly = true;
+        Options.Cookie.IsEssential = true;
+    });
+    builder.Services.AddScoped<CustomerQuestionBuilder>();
+    builder.Services.AddScoped<TechnicianQuestionBuilder>();
+    
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,6 +36,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

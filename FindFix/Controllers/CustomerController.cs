@@ -184,7 +184,92 @@ namespace FindFix.Controllers;
         .ToListAsync();
         return View(requests);
     }
+   [HttpGet]
+   public async Task<IActionResult> LeaveReview(int jobRequestId)
+    {
+        var userId = _userManager.GetUserId(User);
+        var customer = await _context.Customers.FirstOrDefaultAsync(c=>c.UserId==userId);
+        if (customer == null)
+        {
+            return NotFound();
+        }
+        var jobRequest = await _context.JobRequests
+        .Include(j => j.Technician).ThenInclude(t=> t.User)
+        .Include(j => j.Service)
+         .Include (j=>j.Review)
+         .FirstOrDefaultAsync(j => j.Id == jobRequestId && j.CustomerId==customer.Id);
+         if (jobRequest == null)
+         {
+            return NotFound();
+         }
+         var model = new LeaveReviewViewModel
+         {
+             JobRequestId = jobRequest.Id,
+             TechnicianName = jobRequest.Technician.User.FullName,
+             ServiceName = jobRequest.Service.Name
+         };
+         return View(model);
+    }
+    
+    [HttpPost]
    
+    public async Task<IActionResult> LeaveReview(LeaveReviewViewModel model)
+    {
+         Console.WriteLine($"POST received. JobRequestId = {model.JobRequestId}, Rating {model.Rating}");
+        var userId = _userManager.GetUserId(User);
+        var customer = await _context.Customers.FirstOrDefaultAsync(j=>j.UserId==userId);
+        if (customer == null)
+        {
+             Console.WriteLine($"STOP: no customerroe for this log in ");
+            return NotFound();
+        }
+        var jobRequest = await _context.JobRequests
+        .Include(j=>j.Technician).ThenInclude(t=>t.User)
+        .Include(j=> j.Service)
+        .Include(j=>j.Review)
+        .FirstOrDefaultAsync(j => j.Id == model.JobRequestId && j.CustomerId == customer.Id);
+        if (jobRequest == null  ) 
+        {
+            return NotFound();
+        }
+        if (jobRequest.Status != JobStatus.Completed )
+        {
+            ModelState.AddModelError("", "This job is not completed yet");
+        }
+        if (jobRequest.Review != null)
+        {
+           TempData["Message"] = "You have already reviewed this job";
+           return RedirectToAction("MyRequests");
+        }
+        if (!ModelState.IsValid)
+        {
+            model.TechnicianName = jobRequest.Technician.User.FullName;
+            model.ServiceName = jobRequest.Service.Name;
+            return View(model);
+        }
+      
+        var review = new Review
+        {
+            JobRequestId = jobRequest.Id,
+            CustomerId = customer.Id,
+            TechnicianId = jobRequest.TechnicianId,
+            Rating = model.Rating,
+            Comment = model.Comment,
+            DateCreated = DateTime.UtcNow
+        };
+        _context.Reviews.Add(review);
+
+        var technician = jobRequest.Technician;
+          double oldTotal = technician.AverageRating*technician.ReviewCount;
+        technician.ReviewCount += 1;
+        technician.AverageRating = (oldTotal+ model.Rating)/technician.ReviewCount;
+        await _context.SaveChangesAsync();
+        TempData["Message"] = "Thank you! Your review has been saved.";
+        return RedirectToAction("MyRequests");
+
+    }
+
 }
 
    
+

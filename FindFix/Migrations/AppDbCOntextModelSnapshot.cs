@@ -226,7 +226,8 @@ namespace FindFix.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.HasIndex("JobRequestId");
+                    b.HasIndex("JobRequestId")
+                        .IsUnique();
 
                     b.HasIndex("TechnicianId");
 
@@ -515,8 +516,8 @@ namespace FindFix.Migrations
                         .IsRequired();
 
                     b.HasOne("FindFix.Models.JobRequest", "JobRequest")
-                        .WithMany()
-                        .HasForeignKey("JobRequestId")
+                        .WithOne("Review")
+                        .HasForeignKey("FindFix.Models.Review", "JobRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -615,6 +616,11 @@ namespace FindFix.Migrations
                     b.Navigation("JobRequests");
 
                     b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("FindFix.Models.JobRequest", b =>
+                {
+                    b.Navigation("Review");
                 });
 
             modelBuilder.Entity("FindFix.Models.Technician", b =>

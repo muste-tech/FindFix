@@ -3,6 +3,10 @@
     ViewData ["Title"] = "My Requests";
  }
  <h2>My Requests</h2>
+ @if(TempData["Message"] != null)
+ {
+    <div class="alert alert-info">@TempData["Message"]</div>
+ }
  @if(!Model.Any())
  {
     <p>You haven't sent a requests yet</p>
@@ -17,6 +21,10 @@ else{
             <p><strong>Description:</strong> @req.Description</p>
             <p><strong>Location:</strong> @req.Location</p>
             <p><strong>Sent:</strong> @req.DateCreated.ToString("dd MMM yyyy")</p>
+            @if(req.Status== FindFix.Models.JobStatus.Completed && req.Review == null)
+            {
+              <a asp-controller="Customer" asp-action="LeaveReview" asp-route-JobRequestId="@req.Id" class="btn btn-primary">Leave a Review</a>
+            }
         </div>
     }
 }

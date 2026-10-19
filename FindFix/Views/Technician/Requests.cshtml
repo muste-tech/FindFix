@@ -17,7 +17,7 @@
                 <p><strong>Location:</strong> @req.Location</p>
                 <p><strong>Status:</strong> @req.Status</p>
                 <p><strong>Revieved:</strong> @req.DateCreated.ToString("dd MMM yyyy")</p>
-                @if(string.Equals(req.Status=="Pending", StringComparison.OrdinalIgnoreCase))
+                @if(req.Status=="pending")
                 {
                     <form asp-controller="Technician" asp-action="Accept" asp-route-Id="@req.Id" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-secondary">Accept</button>
@@ -27,10 +27,16 @@
                     </form>
 
                 }
-                else if(string.Equals(req.Status=="Accepted", StringComparison.OrdinalIgnoreCase))
+                else if (req.Status == "Accepted")
+                {
+                     <form asp-controller="Technician" asp-action="StartJob" asp-route-Id="@req.Id" method="post" class="mt-2"">
+                        <button type="submit" class="btn btn-primary btn-sm">Start Job</button>
+                    </form>
+                }
+                else if(req.Status=="InProgress")
                 {
                     <form asp-controller="Technician" asp-action="Complete" asp-route-Id="@req.Id" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-secondary">Mark as Completedz</button>
+                        <button type="submit" class="btn btn-secondary">Mark as Completed</button>
                     </form>
                 }
             </div>

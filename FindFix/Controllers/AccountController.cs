@@ -5,6 +5,8 @@ using FindFix.Models;
 using FindFix.Models.ViewModels;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore;
+using FindFix.Services;
+using System.ComponentModel;
 
 namespace FindFix.Controllers;
 public class AccountController : Controller
@@ -12,11 +14,19 @@ public class AccountController : Controller
    private readonly UserManager <ApplicationUser> _userManager ;
    private readonly SignInManager <ApplicationUser> _signInManager;
    public readonly AppDbContext _context;
-   public AccountController (UserManager <ApplicationUser> userManager, SignInManager <ApplicationUser> signInManager, AppDbContext context )
+   public readonly CustomerQuestionBuilder _questionBuilder;
+   public readonly TechnicianQuestionBuilder _technicianQuestionBuilder;
+   public AccountController (UserManager <ApplicationUser> userManager,
+    SignInManager <ApplicationUser> signInManager, AppDbContext context, 
+    CustomerQuestionBuilder questionBuilder, 
+    TechnicianQuestionBuilder technicianQuestionBuilder)
    {
         _userManager = userManager;
         _signInManager = signInManager;
         _context = context;
+        _questionBuilder = questionBuilder;
+        _technicianQuestionBuilder = technicianQuestionBuilder;
+ 
     }
     [HttpGet]
     public IActionResult Register ()
@@ -117,4 +127,141 @@ public class AccountController : Controller
         await _signInManager.SignOutAsync();
         return RedirectToAction ("Index", "Home");
       }
+      [HttpGet]
+      public  IActionResult ForgotPassword()
+    {
+        return View();
     }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+       public async Task< IActionResult > ForgotPassword(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        // Don't reveal whether the account exists
+        if (user == null)
+        {
+            return RedirectToAction("ForgotPasswordConfirmation");
+        }
+        List<SecurityQuestion>? questions = null;
+        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == user.Id);
+        if (customer != null)
+        {
+            questions = await _questionBuilder.BuildAsync(customer);
+        }
+        else
+        {
+            var technician = await _context.Technicians.FirstOrDefaultAsync(c => c.UserId == user.Id);  
+              if (technician != null)
+        {
+            questions = await _technicianQuestionBuilder.BuildAsync(technician);
+        }
+        }
+        if (questions == null || questions.Count == 0)
+        {
+            return RedirectToAction("ForgotPasswordComfirmation");
+        }
+
+        // Store only what the server needs: the user, the questions, and the correct answer
+        HttpContext.Session.SetString("ResetUserId", user.Id);
+        HttpContext.Session.SetString("ResetQuestions", System.Text.Json.JsonSerializer.Serialize(questions));
+        HttpContext.Session.SetInt32("ResetAttempts", 0);
+
+        return RedirectToAction("AnswerQuestions");
+    }
+    public IActionResult ForgotPasswordConfirmation()
+    {
+        return View();
+    }
+    [HttpGet]
+    public IActionResult AnswerQuestions()
+    {
+        var json = HttpContext.Session.GetString("ResetQuestions");
+        if (json == null)
+        {
+            return RedirectToAction("ForgotPassword");
+        }
+        var questions = System.Text.Json.JsonSerializer.Deserialize<List<SecurityQuestion>>(json) ?? new();
+        ViewBag.AttemptsLeft = 3 - (HttpContext.Session.GetInt32("ResetAttempts")?? 0);
+        return View(questions);
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult AnswerQuestions(IFormCollection form)
+    {
+        var json = HttpContext.Session.GetString("ResetQuestions");
+        if (json == null)
+        {
+            return RedirectToAction("ForgotPassword");
+        }
+        var questions = System.Text.Json.JsonSerializer.Deserialize<List<SecurityQuestion>>(json) ?? new();
+        // Count correct answers. Each radio group is named q0, q1, q2.......
+        int correct = 0;
+        for (int i = 0; i < questions.Count; i++)
+        {
+            var chosen = form["q" + i].ToString();
+            if (chosen == questions[i].CorrectAnswer)
+            {
+                correct++;
+            }
+        }
+        // Need 2 correct or every question if there are fewer than 2
+        int needed= Math.Min(2, questions.Count);
+        if (correct >= needed)
+        {
+            HttpContext.Session.SetString("ResetVerified", "true");
+            return RedirectToAction("ResetPassword");
+        }
+        var attempts = (HttpContext.Session.GetInt32("ResetAttempts") ?? 0) +1;
+        if (attempts >= 3)
+        {
+            HttpContext.Session.Clear();
+            TempData["Message"] = "Too many wrong answers, please start again";
+            return RedirectToAction("ForgotPassword");
+        }
+        HttpContext.Session.SetInt32("ResetAttempts", attempts);
+        ViewBag.AttemptsLeft = 3 - attempts;
+        ViewBag.Error = "Some answers were wrong. Try again ";
+        return View (questions);
+    }    
+        [HttpGet]
+        public IActionResult ResetPassword()
+       {
+           if (HttpContext.Session.GetString("ResetVerified") != "true")
+           {
+             return RedirectToAction("ForgotPassword");
+           }
+           return View();
+       }
+       [HttpPost]
+       [ValidateAntiForgeryToken]
+       public async Task<IActionResult> ResetPassword(string password, string confirmPassword)
+    {
+        if (HttpContext.Session.GetString("ResetVerified") != "true")
+           {
+             return RedirectToAction("ForgotPassword");
+           }
+           if (password != confirmPassword)
+           {
+             ViewBag.Error ="The message do not match";
+             return View();
+           }
+           var userId = HttpContext.Session.GetString("ResetUserId");
+           var user = await _userManager.FindByIdAsync(userId?? "");
+           if (user == null)
+           {
+             return RedirectToAction ("ForgotPassword");
+           }
+        //    Identity handles the reset token, so this is a directpassword change
+         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+         var result = await _userManager.ResetPasswordAsync(user, token, password);
+         if (!result.Succeeded)
+         {
+            ViewBag.Error = string.Join(" ", result.Errors.Select(e => e.Description));
+            return View();
+         }
+        //  Clear the reset session so it can't be reused
+        HttpContext.Session.Clear();
+        TempData ["Message"] ="Your password has been changed, You can log in now";
+        return RedirectToAction("Login");
+ }
+}

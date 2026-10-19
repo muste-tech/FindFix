@@ -1,0 +1,28 @@
+@model FindFix.Models.ViewModels.LeaveReviewViewModel
+@{
+    ViewData ["Title"] = "Leave a Review";
+}
+<h2>Leave a Review</h2>
+<p>For <strong>@Model.ServiceName</strong> with <strong>@Model.TechnicianName</strong></p>
+<form asp-controller="Customer" asp-action="LeaveReview" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden"asp-for="JobRequestId">
+    <div class="form-group">
+        <label asp-for="Rating"></label>
+        <select asp-for="Rating" class="form-control">
+            <option value="">-- Select a rating --</option>
+            <option value="5">5 - Excellent </option>
+            <option value="4">4 - Good </option>
+            <option value="3">3 - Average</option>
+            <option value="2">2 - Poor</option>
+            <option value="1">1 - Very Poor</option>
+        </select>
+        <span asp-validation-for="Rating" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Comment"></label>
+        <textarea asp-for="Comment" class="form-control" rows="4" placeholder="Optional comment..."></textarea>
+         <span asp-validation-for="Comment" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Review </button>
+</form>
