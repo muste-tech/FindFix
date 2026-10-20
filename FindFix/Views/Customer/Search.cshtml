@@ -30,7 +30,7 @@ else
         <p>
             @if (tech.ReviewCount>0 )
             {
-                <strong>@tech.AverageRating.ToString("0.0")</strong><text> x (@tech.ReviewCount reviews)</text>
+                <strong>@tech.AverageRating.ToString("0.0")</strong><text> @('\u2605') (@tech.ReviewCount reviews)</text>
             }
             else{
                 <span class="badge bg-secondary">New</span>
