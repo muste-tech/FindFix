@@ -6,7 +6,7 @@
 <h2>Find a Technician</h2>
 <form asp-controller="Customer"asp-action="Search" method="get">
     <div class="form-group">
-    <label>What do you nneed help with</label>
+    <label>What do you need help with</label>
     <input type="text" name="serviceQuery" value="@Model.ServiceQuery" class="form-control" placeholder="plumbing">
 </div>
 <div class="form-group">
@@ -30,7 +30,7 @@ else
         <p>
             @if (tech.ReviewCount>0 )
             {
-                <strong>@tech.AverageRating.ToString("0.0")</strong><text> @('\u2605') (@tech.ReviewCount reviews)</text>
+                <strong>@tech.AverageRating.ToString("0.0" ) @('\u2605')</strong><text> (@tech.ReviewCount reviews)</text>
             }
             else{
                 <span class="badge bg-secondary">New</span>
