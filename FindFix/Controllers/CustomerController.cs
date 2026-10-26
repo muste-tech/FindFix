@@ -22,6 +22,32 @@ namespace FindFix.Controllers;
     {
          return View();
     }
+    [HttpGet]
+    public async Task<IActionResult> EditProfile()
+    {
+        var userId=_userManager.GetUserId(User);
+      var customer = await _context.Customers.FirstOrDefaultAsync(c=>c.UserId==userId);
+      if(customer == null)
+        {
+            return NotFound();
+        }
+        return View (customer);
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditProfile(string location)
+    {
+      var userId = _userManager.GetUserId(User);
+      var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == userId);
+      if (customer == null)
+      {
+        return NotFound();
+      }
+      customer.Location = location?.Trim() ?? "";
+      await _context.SaveChangesAsync();
+      TempData["Message"] ="Profile saved.";
+      return RedirectToAction("Index");
+    }
     public async Task<IActionResult> Search (string? serviceQuery, string? locationQuery)
     {
         var technicians = await _context.Technicians

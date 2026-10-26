@@ -81,7 +81,11 @@ public class AccountController : Controller
         }
         await _context.SaveChangesAsync();
         await _signInManager.SignInAsync(user, isPersistent: false);
-        return RedirectToAction ("Index", "Home");
+        if (model.Role == "Technician")
+        {
+           return RedirectToAction ("CompleteProfile", "Technician");  
+        }
+        return RedirectToAction ("Index", "Customer");
 
     }
     [HttpGet]
