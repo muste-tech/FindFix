@@ -10,7 +10,8 @@ public class TechnicianQuestionBuilder
     {
         "0 to 3 years",
         "4 to 6 years",
-        "7 or more years"
+        "7 or more years",
+        "10 or more years"
     };
     public TechnicianQuestionBuilder( AppDbContext context)
     {
@@ -33,7 +34,7 @@ public class TechnicianQuestionBuilder
             .Where(s => !technician_services.Contains(s.Name))
             .Select(s => s.Name)
             .ToListAsync();
-            var wrong = otherServices.OrderBy(_ => rng.Next()).Take(2).ToList();
+            var wrong = otherServices.OrderBy(_ => rng.Next()).Take(3).ToList();
             questions.Add(MakeQuestion(
                 "Which service do you offer on FindFix?",
                  correctService, wrong, rng));
@@ -44,7 +45,7 @@ public class TechnicianQuestionBuilder
             var places = new[] {"Akure", "Ondo","Ado-Ekiti", "Ibadan", "Lagos"}
             .Where(p => !p.Equals(technician.Location, StringComparison.OrdinalIgnoreCase))
             .OrderBy(_ => rng.Next())
-            .Take(2)
+            .Take(3)
             .ToList();
             questions.Add(MakeQuestion(
                 "Which location did you enter on your profile?",
@@ -63,7 +64,8 @@ public class TechnicianQuestionBuilder
     {
         <= 3 => "0 to 3 years",
         <= 6 => "4 to 6 years",
-        _ => "7 or more year"
+        <= 9 => "7 to 9",
+        _ => "10 or more year"
     };
     private static SecurityQuestion MakeQuestion(string text, string correct, List<string> wrong, Random rng)
     {

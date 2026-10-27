@@ -27,7 +27,7 @@ namespace FindFix.Services
                 .Where(s=>s.Name != lastJob.Service.Name)
                 .Select(s=> s.Name)
                 .ToListAsync();
-                 var wrong = otherServices.OrderBy(_ => rng.Next()).Take(2).ToList();
+                 var wrong = otherServices.OrderBy(_ => rng.Next()).Take(3).ToList();
                  questions.Add(MakeQuestion(
                     "Which service did you request most recently?",
                     lastJob.Service.Name, wrong, rng ));
@@ -38,7 +38,7 @@ namespace FindFix.Services
             var places =new[] {"Akure", "Ondo","Ado-Ekiti", "Ibadan", "Lagos"}
             .Where(p=>!p.Equals(customer.Location, StringComparison.OrdinalIgnoreCase))
             .OrderBy(_ => rng.Next())
-            .Take(2)
+            .Take(3)
             .ToList();
              questions.Add(MakeQuestion(
             "Which location did you enter on your profile?",
@@ -50,7 +50,8 @@ namespace FindFix.Services
         var wrongMonths = new List<string>
         {
             joined.AddMonths(-2).ToString("MMM yyyy"),
-            joined.AddMonths(3).ToString("MMM yyyy")
+            joined.AddMonths(3).ToString("MMM yyyy"),
+            joined.AddMonths(-5).ToString("MMM yyyy")
         };
         questions.Add(MakeQuestion(
             "When did you join FindFix?",

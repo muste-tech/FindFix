@@ -146,6 +146,16 @@ public class AccountController : Controller
         {
             return RedirectToAction("ForgotPasswordConfirmation");
         }
+        if (await _userManager.IsLockedOutAsync(user))
+        {
+            TempData["Message"] ="Too many wrong answers, please try again in 30 minutes.";
+            return RedirectToAction("ForgotPassword");
+        }
+        // The lock has ended, so start a fresh count
+       if (await _userManager.GetAccessFailedCountAsync(user) >= 3)
+       {
+        await _userManager.ResetAccessFailedCountAsync(user);
+       }
         List<SecurityQuestion>? questions = null;
         var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == user.Id);
         if (customer != null)
@@ -168,7 +178,6 @@ public class AccountController : Controller
         // Store only what the server needs: the user, the questions, and the correct answer
         HttpContext.Session.SetString("ResetUserId", user.Id);
         HttpContext.Session.SetString("ResetQuestions", System.Text.Json.JsonSerializer.Serialize(questions));
-        HttpContext.Session.SetInt32("ResetAttempts", 0);
 
         return RedirectToAction("AnswerQuestions");
     }
@@ -177,24 +186,39 @@ public class AccountController : Controller
         return View();
     }
     [HttpGet]
-    public IActionResult AnswerQuestions()
+    public async Task < IActionResult > AnswerQuestions()
     {
         var json = HttpContext.Session.GetString("ResetQuestions");
-        if (json == null)
+        var userId =  HttpContext.Session.GetString("ResetUserId");
+        if (json == null || userId == null)
         {
             return RedirectToAction("ForgotPassword");
         }
+        var user = await _userManager.FindByIdAsync(userId);
+        var failed = user == null ? 0 : await _userManager.GetAccessFailedCountAsync(user);
         var questions = System.Text.Json.JsonSerializer.Deserialize<List<SecurityQuestion>>(json) ?? new();
-        ViewBag.AttemptsLeft = 3 - (HttpContext.Session.GetInt32("ResetAttempts")?? 0);
+        ViewBag.AttemptsLeft = 3 - failed;
         return View(questions);
     }
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult AnswerQuestions(IFormCollection form)
+    public async Task<IActionResult> AnswerQuestions(IFormCollection form)
     {
         var json = HttpContext.Session.GetString("ResetQuestions");
-        if (json == null)
+        var userId = HttpContext.Session.GetString("ResetUserId");
+        if (json == null || userId==null)
         {
+            return RedirectToAction("ForgotPassword");
+        }
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return RedirectToAction("ForgotPassword");
+        }
+        if (await _userManager.IsLockedOutAsync(user))
+        {
+            HttpContext.Session.Clear();
+            TempData["Message"]="Too many wrong answers, please try agin after 30 minutes";
             return RedirectToAction("ForgotPassword");
         }
         var questions = System.Text.Json.JsonSerializer.Deserialize<List<SecurityQuestion>>(json) ?? new();
@@ -212,18 +236,20 @@ public class AccountController : Controller
         int needed= Math.Min(2, questions.Count);
         if (correct >= needed)
         {
+            await _userManager.ResetAccessFailedCountAsync(user);
             HttpContext.Session.SetString("ResetVerified", "true");
             return RedirectToAction("ResetPassword");
-        }
-        var attempts = (HttpContext.Session.GetInt32("ResetAttempts") ?? 0) +1;
-        if (attempts >= 3)
+        } 
+        // wrong answers: ide.2ntity counts them on the account
+        await _userManager.AccessFailedAsync(user);
+        if(await _userManager.IsLockedOutAsync(user))
         {
             HttpContext.Session.Clear();
-            TempData["Message"] = "Too many wrong answers, please start again";
+              TempData["Message"] = "Too many wrong answers, please try again in 30 minutes";
             return RedirectToAction("ForgotPassword");
         }
-        HttpContext.Session.SetInt32("ResetAttempts", attempts);
-        ViewBag.AttemptsLeft = 3 - attempts;
+        var attemptsLeft = 3- await _userManager.GetAccessFailedCountAsync(user);
+        ViewBag.AttemptsLeft =  attemptsLeft;
         ViewBag.Error = "Some answers were wrong. Try again ";
         return View (questions);
     }    
