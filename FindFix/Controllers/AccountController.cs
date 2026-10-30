@@ -218,7 +218,7 @@ public class AccountController : Controller
         if (await _userManager.IsLockedOutAsync(user))
         {
             HttpContext.Session.Clear();
-            TempData["Message"]="Too many wrong answers, please try agin after 30 minutes";
+            TempData["Message"]="This account has been temporary locked, please try agin after 30 minutes";
             return RedirectToAction("ForgotPassword");
         }
         var questions = System.Text.Json.JsonSerializer.Deserialize<List<SecurityQuestion>>(json) ?? new();
@@ -240,7 +240,7 @@ public class AccountController : Controller
             HttpContext.Session.SetString("ResetVerified", "true");
             return RedirectToAction("ResetPassword");
         } 
-        // wrong answers: ide.2ntity counts them on the account
+        // wrong answers: identity counts them on the account
         await _userManager.AccessFailedAsync(user);
         if(await _userManager.IsLockedOutAsync(user))
         {
@@ -248,7 +248,7 @@ public class AccountController : Controller
               TempData["Message"] = "Too many wrong answers, please try again in 30 minutes";
             return RedirectToAction("ForgotPassword");
         }
-        var attemptsLeft = 3- await _userManager.GetAccessFailedCountAsync(user);
+        var attemptsLeft =  _userManager.Options.Lockout.MaxFailedAccessAttempts - await _userManager.GetAccessFailedCountAsync(user);
         ViewBag.AttemptsLeft =  attemptsLeft;
         ViewBag.Error = "Some answers were wrong. Try again ";
         return View (questions);
