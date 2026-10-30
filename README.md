@@ -62,7 +62,7 @@ FindFix/
 
 - .NET 10 SDK
 - MySQL 8 server running locally
-- Visual Studio 2022 or VS Code with the C# extension
+-  VS Code with the C# extension
 
 ### Setup
 
