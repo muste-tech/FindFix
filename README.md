@@ -4,6 +4,13 @@ FindFix is a web marketplace that connects customers with repair technicians. A 
 
 ## Features
 
+- Customer and technician registration and login
+# FindFix
+
+FindFix is a web marketplace that connects customers with repair technicians. A customer searches for a service in their area, sends a job request, and leaves a review after the work is done. Technicians build a profile, accept or decline jobs, and track each job through to completion.
+
+## Features
+
 **Customers**
 - Register and log in
 - Edit profile (location)
@@ -96,6 +103,7 @@ To enable job notifications, log in and click **Turn on job notifications**, the
 ## Known Limitations
 
 - **Password reset guessing:** restarting the reset flow no longer clears the wrong-answer count, since it's stored on the account. The remaining risk is that someone who knows the account owner can answer the questions. A one-time code sent to a phone or email is the planned stronger fix.
+- **Four-option questions:** the service question needs at least four services in the database to show four options.
 - **No email or SMS delivery yet.** Notifications only appear while the site is open in a browser. Closed-app push notifications need a push service, which is planned.
 - **Customer location** is entered on the profile page, but customers are not asked for other details.
 - **Search requires login.** Visitors who are not logged in are redirected to the login page.
