@@ -10,6 +10,7 @@ FindFix is a web marketplace that connects customers with repair technicians.
 - Job requests with accept, start, and complete steps
 - Reviews and ratings after a completed job
 - Forgot password using security questions
+- User receive job notification on their mobile
 
 ## Tech Stack
 
@@ -28,5 +29,4 @@ FindFix is a web marketplace that connects customers with repair technicians.
 
 ## Known Limitations
 
-- Password reset security questions can be guessed by restarting the flow. A database lockout is planned.
-- No email or SMS delivery yet. Notifications are planned.
+- Null
